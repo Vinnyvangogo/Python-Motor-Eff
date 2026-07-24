@@ -60,6 +60,10 @@ I_NAMES  = [f"I_PH{s}" for s in ["A_IN","B_IN","C_IN","A_OUT","B_OUT","C_OUT"]]
 ALL_NAMES   = V_NAMES + I_NAMES
 ALL_UNITS   = ["V"] * N_CH + ["A"] * N_CH
 
+# Phase groupings — CH0-2 are input side, CH3-5 are output side
+INPUT_PHASES  = [0, 1, 2]
+OUTPUT_PHASES = [3, 4, 5]
+
 # Colours — two contrast palettes for V and I channels
 V_COLORS = ["#58a6ff","#3fb950","#f0883e","#79c0ff","#56d364","#ffa657"]
 I_COLORS = ["#ff7b72","#d2a8ff","#ffa657","#ff9a9a","#c9a0ff","#ffbf7b"]
@@ -336,7 +340,7 @@ class BinViewer(tk.Tk):
         self._stats_text = tk.Text(stats_f, bg=C_PANEL, fg=C_TEXT,
                                     font=FONT_MONOS, relief="flat",
                                     state="disabled", wrap="none",
-                                    width=26)
+                                    width=32)
         sb = ttk.Scrollbar(stats_f, orient="vertical",
                             command=self._stats_text.yview)
         self._stats_text.configure(yscrollcommand=sb.set)
@@ -688,10 +692,19 @@ class BinViewer(tk.Tk):
         self._update_stats(cal_win, active)
 
     def _update_stats(self, cal_win: np.ndarray, active: list[int]):
+        """Compute and display per-channel stats plus power/PF/efficiency
+        for the current view window.
+
+        Power calculations require at least one V and one I channel to be
+        visible.  V and I channels are matched by phase index (V0↔I0 … V5↔I5).
+        """
         lines = []
-        lines.append(f"{'Ch':<4} {'Name':<20} {'RMS':>8} {'Peak':>8} "
-                     f"{'Crest':>6} {'Freq(Hz)':>9}")
-        lines.append("─" * 62)
+
+        # ── Per-channel table ─────────────────────────────────────────────
+        lines.append("── Channel Stats ─────────────────────────────")
+        lines.append(f"{'Ch':<4} {'Name':<18} {'RMS':>8} {'Peak':>8} "
+                     f"{'Crest':>6} {'Hz':>7}")
+        lines.append("─" * 55)
         for ch in active:
             st = channel_stats(cal_win[:, ch], self._fs)
             if not st:
@@ -700,11 +713,95 @@ class BinViewer(tk.Tk):
             rms   = f"{st['rms']:.3f}{units}"
             peak  = f"{st['peak']:.3f}{units}"
             crest = f"{st['crest']:.2f}" if np.isfinite(st['crest']) else "---"
-            freq  = f"{st['freq']:.1f}" if np.isfinite(st['freq']) else "---"
-            name  = ALL_NAMES[ch][:18]
+            freq  = f"{st['freq']:.0f}"  if np.isfinite(st['freq'])  else "---"
+            name  = ALL_NAMES[ch][:16]
             label = f"{'V' if ch<N_CH else 'I'}{ch%N_CH}"
-            lines.append(f"{label:<4} {name:<20} {rms:>8} {peak:>8} "
-                         f"{crest:>6} {freq:>9}")
+            lines.append(f"{label:<4} {name:<18} {rms:>8} {peak:>8} "
+                         f"{crest:>6} {freq:>7}")
+
+        # ── Power, PF, Efficiency ─────────────────────────────────────────
+        lines.append("")
+        lines.append("── Power Analysis ────────────────────────────")
+
+        # Determine which phase indices have BOTH V and I visible
+        v_active_phases = {ch     for ch in active if ch < N_CH}
+        i_active_phases = {ch-N_CH for ch in active if ch >= N_CH}
+        paired_phases   = sorted(v_active_phases & i_active_phases)
+
+        if not paired_phases:
+            lines.append("  (Need matching V and I channels visible)")
+            lines.append("  e.g. V0 + I0 for phase A-IN power")
+        else:
+            # Align to complete AC cycles to make mean(v*i) exact
+            spc   = self._fs / max(1.0, self._ac_freq)
+            n_cyc = max(1, int(cal_win.shape[0] // spc))
+            n_use = int(round(n_cyc * spc))
+            w     = cal_win[:n_use]
+
+            if n_use < 2:
+                lines.append("  (Window too short for power calc)")
+            else:
+                lines.append(f"  Cycles in view: {n_cyc}  "
+                             f"({n_use} samples used)")
+                lines.append("")
+                lines.append(f"{'Ph':<5} {'Signal':<16} {'P(W)':>9} "
+                             f"{'S(VA)':>9} {'Q(VAR)':>9} {'PF':>6}")
+                lines.append("─" * 58)
+
+                p_in = p_out = s_in = s_out = 0.0
+
+                for ph in paired_phases:
+                    v_col = ph            # column in cal_win
+                    i_col = N_CH + ph
+
+                    v = w[:, v_col]
+                    i = w[:, i_col]
+
+                    vrms = float(np.sqrt(np.nanmean(v**2)))
+                    irms = float(np.sqrt(np.nanmean(i**2)))
+                    P    = float(np.nanmean(v * i))     # real power W
+                    S    = vrms * irms                   # apparent power VA
+                    Q    = float(np.sqrt(max(0.0, S**2 - P**2)))
+                    pf   = P / S if S > 1e-6 else 0.0
+
+                    side = "IN " if ph in INPUT_PHASES else "OUT"
+                    name = V_NAMES[ph][:14]
+                    ph_label = f"{side}{ph%3+1}"
+
+                    lines.append(f"{ph_label:<5} {name:<16} "
+                                 f"{P:>9.2f} {S:>9.2f} "
+                                 f"{Q:>9.2f} {pf:>6.4f}")
+
+                    if ph in INPUT_PHASES:
+                        p_in  += P;  s_in  += S
+                    else:
+                        p_out += P;  s_out += S
+
+                # Three-phase totals
+                lines.append("─" * 58)
+
+                def _pf(p, s):
+                    return f"{p/s:.4f}" if s > 1e-6 else "---"
+
+                lines.append(f"{'3Φ IN':<5} {'Total Input':<16} "
+                             f"{p_in:>9.2f} {s_in:>9.2f} "
+                             f"{'---':>9} {_pf(p_in,s_in):>6}")
+                lines.append(f"{'3Φ OUT':<5} {'Total Output':<16} "
+                             f"{p_out:>9.2f} {s_out:>9.2f} "
+                             f"{'---':>9} {_pf(p_out,s_out):>6}")
+
+                lines.append("")
+                losses = p_in - p_out
+                if p_in > 1e-3:
+                    eff = p_out / p_in * 100
+                    eff_bar = "█" * int(eff/5) + "░" * (20 - int(eff/5))
+                    lines.append(f"  Efficiency  : {eff:.3f} %")
+                    lines.append(f"  [{eff_bar}]")
+                    lines.append(f"  Losses      : {losses:.3f} W")
+                    lines.append(f"  PF (input)  : {_pf(p_in, s_in)}")
+                    lines.append(f"  PF (output) : {_pf(p_out, s_out)}")
+                else:
+                    lines.append("  (Input power too low for efficiency calc)")
 
         self._stats_text.config(state="normal")
         self._stats_text.delete("1.0", "end")
