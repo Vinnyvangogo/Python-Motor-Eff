@@ -1,0 +1,921 @@
+{
+  "_info": "cDAQ-9189 calibration file. Applied as: output = (raw * scale) + offset. Edit scale and offset values here, then restart the script or click Apply All on the Calibration tab to load them. Saved: 2026-07-02 15:43:55",
+  "chassis_name": "cDAQ9189-24E8D67",
+  "ip_address": "169.254.32.5",
+  "auto_start_on_connect": true,
+  "recording": {
+    "auto_record_on_start": false,
+    "log_filename_prefix": "cdaq_data",
+    "record_start_delay_sec": 2.0,
+    "timed_recording": false,
+    "record_duration_sec": 300,
+    "_note": "auto_record_on_start: start CSV automatically once data is on screen. log_filename_prefix: base name for the CSV file (timestamp appended). record_start_delay_sec: seconds to wait after modules start before recording begins (allows DAQ to settle and fill its buffer). timed_recording: if true, stop all acquisition and close CSV after record_duration_sec seconds, then close the app. If false, record_duration_sec is ignored."
+  },
+  "motor_analyser": {
+    "capture_filename_prefix": "motor_raw",
+    "capture_start_delay_sec": 2.0,
+    "capture_duration_sec": 0,
+    "module_2_voltage_channel_roles": [
+      "V-In",
+      "V-In",
+      "V-In",
+      "V-Out",
+      "V-Out",
+      "V-Out",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused"
+    ],
+    "module_3_current_channel_roles": [
+      "I-In",
+      "I-In",
+      "I-In",
+      "I-Out",
+      "I-Out",
+      "I-Out",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused",
+      "Unused"
+    ],
+    "_note": "capture_filename_prefix: base name for .bin capture files (timestamp appended automatically). capture_start_delay_sec: seconds to wait after acquisition starts before auto-recording begins. capture_duration_sec: how long to record in seconds (0 = unlimited, record until manually stopped). module_2_voltage_channel_roles: role for each of the 16 channels on Module 2 (Voltage). module_3_current_channel_roles: role for each of the 16 channels on Module 3 (Current). Valid roles: V-In, V-Out, I-In, I-Out, Unused."
+  },
+  "module_config": {
+    "module_1_TC_9213": {
+      "hw_sample_rate_hz": 75,
+      "capture_rate_hz": 1,
+      "_note": "9213 thermocouple. hw_sample_rate_hz must be >= capture_rate_hz."
+    },
+    "modules_2_to_6_AI_9320": {
+      "hw_sample_rate_hz": 3200,
+      "capture_rate_hz": 250,
+      "csv_capture_rate_hz": 250,
+      "_note": "9320 analog input. hw_sample_rate_hz is limited by networked chassis bandwidth -- 200,000 S/s causes Error -200361 (onboard FIFO overflow) and -200279 (application not keeping up) because 80 ch x 200kS/s = 32 MB/s exceeds what the cDAQ-9189 can sustain over Ethernet. For accurate AC RMS, set hw_sample_rate_hz to a value your chassis can sustain (3200-32000 S/s) -- RMS accuracy depends on capturing complete AC cycles, not raw sample count. ac_frequency_hz: mains frequency (60 for US, 50 for EU). ac_cycles_per_block: integer cycles to capture per RMS calculation (more = more averaging, higher latency). csv_capture_rate_hz controls how many RMS rows/sec are written to CSV.",
+      "ac_frequency_hz": 60,
+      "ac_cycles_per_block": 3,
+      "high_rate_task": {
+        "enabled": true,
+        "hw_sample_rate_hz": 200000,
+        "modules": [
+          2,
+          3
+        ],
+        "channels": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "_note": "12 active channels (CH0-5 on Mod2 + CH0-5 on Mod3) at 200,000 S/s. Total bandwidth: 12ch x 200kS/s x 2B = 4.8 MB/s + 68 spare ch x 3.2kS/s = 5.24 MB/s total -- within cDAQ-9189 Ethernet limit. Gives 100 samples/cycle at 2000Hz, 500 samples/cycle at 400Hz."
+      }
+    },
+    "module_7_AI_9223": {
+      "hw_sample_rate_hz": 20000,
+      "capture_rate_hz": 10000,
+      "_note": "9223 high-speed analog input. Must be >= capture_rate_hz."
+    }
+  },
+  "NI_9213_module_1_thermocouples": [
+    {
+      "module": 1,
+      "channel": 0,
+      "name": "MCU1_Pos1",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 1,
+      "name": "MCU1_Pos2",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 2,
+      "name": "MCU1_Pos3",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 3,
+      "name": "MCU1_Pos4",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 4,
+      "name": "MCU1_Pos5",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 5,
+      "name": "MCU1_Pos6",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 6,
+      "name": "MCU2_Pos1",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 7,
+      "name": "MCU2_Pos2",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 8,
+      "name": "MCU2_Pos3",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 9,
+      "name": "MCU2_Pos4",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 10,
+      "name": "MCU2_Pos5",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 11,
+      "name": "MCU2_Pos6",
+      "enabled": true,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 12,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 13,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 14,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "module": 1,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": 1.0,
+      "offset": 0.0
+    }
+  ],
+  "NI_9320_modules_2_to_6": [
+    {
+      "module": 2,
+      "channel": 0,
+      "name": "M1ACIN_PHA_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.1045587896",
+      "offset": "-0.145545044006"
+    },
+    {
+      "module": 2,
+      "channel": 1,
+      "name": "M1ACIN_PHB_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.1934205311",
+      "offset": "-0.106064209275"
+    },
+    {
+      "module": 2,
+      "channel": 2,
+      "name": "M1ACIN_PHC_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.3726906561",
+      "offset": "-0.128680802903"
+    },
+    {
+      "module": 2,
+      "channel": 3,
+      "name": "EPDU_PHA_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.8915703603",
+      "offset": "-0.193431339225"
+    },
+    {
+      "module": 2,
+      "channel": 4,
+      "name": "EPDU_PHB_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.8080499299",
+      "offset": "-0.266997834671"
+    },
+    {
+      "module": 2,
+      "channel": 5,
+      "name": "EPDU_PHC_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.8167352654",
+      "offset": "-0.187495226376"
+    },
+    {
+      "module": 2,
+      "channel": 6,
+      "name": "M2ACIN_PHA_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.2885041872",
+      "offset": "-0.261302174705"
+    },
+    {
+      "module": 2,
+      "channel": 7,
+      "name": "M2ACIN_PHB_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.2548124628",
+      "offset": "-0.203572137329"
+    },
+    {
+      "module": 2,
+      "channel": 8,
+      "name": "M2ACIN_PHC_VSENSE_OUT",
+      "enabled": true,
+      "scale": "44.269454738",
+      "offset": "-0.159370037057"
+    },
+    {
+      "module": 2,
+      "channel": 9,
+      "name": "LAA_PHA_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.7285677945",
+      "offset": "-0.136148562707"
+    },
+    {
+      "module": 2,
+      "channel": 10,
+      "name": "LAA_PHB_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.529637923",
+      "offset": "-0.175241877561"
+    },
+    {
+      "module": 2,
+      "channel": 11,
+      "name": "LAA_PHC_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.9126486763",
+      "offset": "-0.244724389308"
+    },
+    {
+      "module": 2,
+      "channel": 12,
+      "name": "LOA_PHA_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.7743030509",
+      "offset": "-0.187355200068"
+    },
+    {
+      "module": 2,
+      "channel": 13,
+      "name": "LOA_PHB_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.7270567271",
+      "offset": "-0.175853875854"
+    },
+    {
+      "module": 2,
+      "channel": 14,
+      "name": "LOA_PHC_VSENSE_OUT",
+      "enabled": true,
+      "scale": "56.9119523607",
+      "offset": "-0.284559761803"
+    },
+    {
+      "module": 2,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 3,
+      "channel": 0,
+      "name": "M1ACIN_PHA_ISENSE",
+      "enabled": true,
+      "scale": "2.13392514191",
+      "offset": "-0.00149374759933"
+    },
+    {
+      "module": 3,
+      "channel": 1,
+      "name": "M1ACIN_PHB_ISENSE",
+      "enabled": true,
+      "scale": "2.13095424131",
+      "offset": "-0.00191785881718"
+    },
+    {
+      "module": 3,
+      "channel": 2,
+      "name": "M1ACIN_PHC_ISENSE",
+      "enabled": true,
+      "scale": "2.13690433792",
+      "offset": "-0.00106845216896"
+    },
+    {
+      "module": 3,
+      "channel": 3,
+      "name": "EPDU_PHA_ISENSE",
+      "enabled": true,
+      "scale": "4.28602043003",
+      "offset": "-0.00214301021502"
+    },
+    {
+      "module": 3,
+      "channel": 4,
+      "name": "EPDU_PHB_ISENSE",
+      "enabled": true,
+      "scale": "4.27990584207",
+      "offset": "-0.00213995292104"
+    },
+    {
+      "module": 3,
+      "channel": 5,
+      "name": "EPDU_PHC_ISENSE",
+      "enabled": true,
+      "scale": "4.27990584207",
+      "offset": "-0.00213995292104"
+    },
+    {
+      "module": 3,
+      "channel": 6,
+      "name": "M2ACIN_PHA_ISENSE",
+      "enabled": true,
+      "scale": "1.26722062311",
+      "offset": "-0.00139394268542"
+    },
+    {
+      "module": 3,
+      "channel": 7,
+      "name": "M2ACIN_PHB_ISENSE",
+      "enabled": true,
+      "scale": "1.26653277606",
+      "offset": "-0.00139318605366"
+    },
+    {
+      "module": 3,
+      "channel": 8,
+      "name": "M2ACIN_PHC_ISENSE",
+      "enabled": true,
+      "scale": "1.2525274214",
+      "offset": "-0.00162828564783"
+    },
+    {
+      "module": 3,
+      "channel": 9,
+      "name": "LAA_PHA_ISENSE",
+      "enabled": true,
+      "scale": "1.2679092177",
+      "offset": "-0.00101432737416"
+    },
+    {
+      "module": 3,
+      "channel": 10,
+      "name": "LAA_PHB_ISENSE",
+      "enabled": true,
+      "scale": "1.27383125982",
+      "offset": "-0.00101906500786"
+    },
+    {
+      "module": 3,
+      "channel": 11,
+      "name": "LAA_PHC_ISENSE",
+      "enabled": true,
+      "scale": "1.26074257738",
+      "offset": "-0.00113466831964"
+    },
+    {
+      "module": 3,
+      "channel": 12,
+      "name": "LOA_PHA_ISENSE",
+      "enabled": true,
+      "scale": "1.25675505844",
+      "offset": "-0.000754053035063"
+    },
+    {
+      "module": 3,
+      "channel": 13,
+      "name": "LOA_PHB_ISENSE",
+      "enabled": true,
+      "scale": "1.24968757811",
+      "offset": "-0.000749812546863"
+    },
+    {
+      "module": 3,
+      "channel": 14,
+      "name": "LOA_PHC_ISENSE",
+      "enabled": true,
+      "scale": "1.26087504728",
+      "offset": "-0.00100870003783"
+    },
+    {
+      "module": 3,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 0,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 1,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 2,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 3,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 4,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 5,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 6,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 7,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 8,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 9,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 10,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 11,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 12,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 13,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 14,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 4,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 0,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 1,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 2,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 3,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 4,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 5,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 6,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 7,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 8,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 9,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 10,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 11,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 12,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 13,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 14,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 5,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 0,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 1,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 2,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 3,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 4,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 5,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 6,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 7,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 8,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 9,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 10,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 11,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 12,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 13,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 14,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 6,
+      "channel": 15,
+      "name": "SPARE",
+      "enabled": false,
+      "scale": "1.0",
+      "offset": "0.0"
+    }
+  ],
+  "NI_9223_module_7": [
+    {
+      "module": 7,
+      "channel": 1,
+      "name": "A429_DSCS_TX_A",
+      "enabled": true,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 7,
+      "channel": 2,
+      "name": "A429_DSCS_RX_A",
+      "enabled": true,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 7,
+      "channel": 3,
+      "name": "A429_MCU2_TX_A",
+      "enabled": true,
+      "scale": "1.0",
+      "offset": "0.0"
+    },
+    {
+      "module": 7,
+      "channel": 4,
+      "name": "A429_MCU2_RX_A",
+      "enabled": true,
+      "scale": "1.0",
+      "offset": "0.0"
+    }
+  ],
+  "NI_9263_module_8_ao_reference": [
+    {
+      "module": 8,
+      "channel": 0,
+      "name": "DSCS_STO_RAMP_DAQ"
+    },
+    {
+      "module": 8,
+      "channel": 1,
+      "name": "MCU2_EN_RAMP_DAQ"
+    },
+    {
+      "module": 8,
+      "channel": 2,
+      "name": "EMPTY"
+    },
+    {
+      "module": 8,
+      "channel": 3,
+      "name": "EMPTY"
+    }
+  ]
+}
