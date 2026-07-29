@@ -752,8 +752,49 @@ class MotorAnalyserApp(tk.Tk):
             s.map(nm, background=[("active",C_BORD)])
         s.configure("TEntry", fieldbackground=C_INPUT, foreground=C_TEXT)
         s.configure("TProgressbar", troughcolor=C_BORD, background=C_ACC)
-        s.configure("TCombobox", fieldbackground=C_INPUT, foreground=C_TEXT,
-                    background=C_PANEL, arrowcolor=C_ACC)
+
+        # ── Combobox — every visual element covered ───────────────────────
+        # Static colours for the closed widget
+        s.configure("TCombobox",
+                    fieldbackground = C_INPUT,    # text area background
+                    foreground      = C_TEXT,     # selected / typed text
+                    background      = C_PANEL,    # arrow button background
+                    arrowcolor      = C_ACC,      # dropdown arrow glyph
+                    bordercolor     = C_BORD,     # outer border
+                    lightcolor      = C_BORD,     # top/left inner highlight
+                    darkcolor       = C_BORD,     # bottom/right inner shadow
+                    relief          = "flat",
+                    padding         = [4, 3],
+                    font            = FONT_MONO)
+
+        # State-based colour overrides (hover, focus, disabled, readonly)
+        s.map("TCombobox",
+              fieldbackground = [("readonly",  C_INPUT),
+                                 ("disabled",  C_PANEL),
+                                 ("focus",     C_INPUT),
+                                 ("hover",     C_INPUT)],
+              foreground      = [("readonly",  C_TEXT),
+                                 ("disabled",  C_MUTED),
+                                 ("focus",     C_TEXT)],
+              background      = [("readonly",  C_PANEL),
+                                 ("active",    C_BORD),
+                                 ("pressed",   C_BORD)],
+              arrowcolor      = [("disabled",  C_MUTED),
+                                 ("pressed",   C_GREEN),
+                                 ("focus",     C_GREEN)],
+              bordercolor     = [("focus",     C_ACC),
+                                 ("hover",     C_ACC)])
+
+        # Dropdown listbox — lives outside the ttk system so must use
+        # classic Tk option_add overrides.  These apply to every Listbox
+        # created after this point (which in this app means the popdown).
+        self.option_add("*TCombobox*Listbox.background",       C_INPUT)
+        self.option_add("*TCombobox*Listbox.foreground",       C_TEXT)
+        self.option_add("*TCombobox*Listbox.selectBackground", C_ACC)
+        self.option_add("*TCombobox*Listbox.selectForeground", "#000000")
+        self.option_add("*TCombobox*Listbox.font",             FONT_MONO)
+        self.option_add("*TCombobox*Listbox.relief",           "flat")
+        self.option_add("*TCombobox*Listbox.borderWidth",      "0")
 
     # ══════════════════════════════════════════════════════════════════════
     #  UI
@@ -2047,4 +2088,3 @@ class MotorAnalyserApp(tk.Tk):
 if __name__ == "__main__":
     app = MotorAnalyserApp()
     app.mainloop()
- 
