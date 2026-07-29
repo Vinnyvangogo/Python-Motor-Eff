@@ -2047,3 +2047,4 @@ class MotorAnalyserApp(tk.Tk):
 if __name__ == "__main__":
     app = MotorAnalyserApp()
     app.mainloop()
+ 
